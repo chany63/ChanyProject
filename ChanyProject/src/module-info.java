@@ -1,0 +1,9 @@
+/**
+ * 
+ */
+/**
+ * @author com
+ *
+ */
+module ChanyProject {
+}
