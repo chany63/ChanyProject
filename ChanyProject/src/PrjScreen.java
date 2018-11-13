@@ -79,11 +79,8 @@ public class PrjScreen {
 		ImagePanel firstscreenPanel = new ImagePanel(new ImageIcon("C:/Users/com/git/ChanyProject/ChanyProject/image/택배프로그램 배경화면.png").getImage());
 		frame.getContentPane().add(firstscreenPanel);
 		
-		JPanel studPanel = new JPanel();
-		studPanel.setBackground(Color.WHITE);
-		studPanel.setBounds(0, 0, 1186, 763);
+		ImagePanel studPanel = new ImagePanel(new ImageIcon("C:/Users/com/git/ChanyProject/ChanyProject/image/학생 배경화면.png").getImage());
 		frame.getContentPane().add(studPanel);
-		studPanel.setLayout(null);
 		studPanel.setVisible(false);
 		
 		JLabel lblNewLabel = new JLabel("\uD559\uC0DD\uC6A9 \uD398\uC774\uC9C0\uC785\uB2C8\uB2E4");
@@ -92,44 +89,62 @@ public class PrjScreen {
 		studPanel.add(lblNewLabel);
 		
 		namesearchTxt = new JTextField();
+		namesearchTxt.setFont(new Font("맑은 고딕", Font.PLAIN, 28));
 		namesearchTxt.setBounds(439, 282, 338, 70);
 		studPanel.add(namesearchTxt);
 		namesearchTxt.setColumns(10);
+		
+		JButton gofirstButton_stud = new JButton("초기화면으로 돌아가기");
+		gofirstButton_stud.setFont(new Font("문체부 훈민정음체", Font.PLAIN, 18));
+		gofirstButton_stud.setBounds(800,700,300,40);
+		studPanel.add(gofirstButton_stud);
+		gofirstButton_stud.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				JOptionPane.showMessageDialog(null, "초기화면으로 돌아갑니다.");
+				studPanel.setVisible(false);
+				namesearchTxt.setText("");
+				firstscreenPanel.setVisible(true);
+			}
+		});
 		
 		JButton namesearchButton = new JButton("\uAC80\uC0C9");
 		namesearchButton.setFont(new Font("문체부 훈민정음체", Font.PLAIN, 28));
 		namesearchButton.setBounds(822, 282, 102, 70);
 		studPanel.add(namesearchButton);
-		studPanel.setVisible(false);
 		namesearchButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				JOptionPane.showMessageDialog(null, "학생의 이름이 검색됩니다.");
 				String name = namesearchTxt.getText();
-				while(true)
-			      {
-			         boolean check = true;
-			         Iterator<Box> it = index.iterator();
+				if (name.equals("")) {
+					JOptionPane.showMessageDialog(null, "학생의 이름을 입력해주세요.");
+				}
+				else{
+					JOptionPane.showMessageDialog(null, "학생의 이름이 검색됩니다.");
+					while(true)
+			      	{
+			         	boolean check = true;
+			         	Iterator<Box> it = index.iterator();
 			         
-			         if(it.hasNext() == false) check = false;
+			         	if(it.hasNext() == false) check = false;
 			         
-			         while(it.hasNext()) {
-			            Box tmp = it.next();
-			            if(tmp.name.equals(name))
-			            {
-			            	JOptionPane.showMessageDialog(null, "택배를 확인하여 수취합니다.");
-			            	JOptionPane.showMessageDialog(null, "수취한 택배 정보: " + tmp.name + ", " + tmp.room_num + ", " + tmp.product + ", " + tmp.deliv_date + ", " + tmp.box_loc);
-			               index.remove(tmp);
-			               break;   
-			            }
-			            else JOptionPane.showMessageDialog(null, "해당 학생에 대해 보관된 택배가 없습니다.");
-			            check = false;
-			         }
+			         	while(it.hasNext()) {
+			        	 Box tmp = it.next();
+			            	if(tmp.name.equals(name)) {
+			            		JOptionPane.showMessageDialog(null, "택배를 확인하여 수취합니다.");
+			            		JOptionPane.showMessageDialog(null, "수취한 택배 정보: " + tmp.name + ", " + tmp.room_num + ", " + tmp.product + ", " + tmp.deliv_date + ", " + tmp.box_loc);
+			            		studPanel.setVisible(false);
+								namesearchTxt.setText("");
+								firstscreenPanel.setVisible(true);
+								index.remove(tmp);
+								break;   
+			            	}
+			            	else JOptionPane.showMessageDialog(null, "해당 학생에 대해 보관된 택배가 없습니다.");
+			            	check = false;
+			         	}
 			         
-			         if(check == false) break;
-			      }
-				studPanel.setVisible(false);
-				firstscreenPanel.setVisible(true);
-			}	
+			         	if(check == false) break;
+			      	}
+				}	
+			}
 		});
 		
 		JPanel delPanel = new JPanel();
@@ -138,6 +153,7 @@ public class PrjScreen {
 		frame.getContentPane().add(delPanel);
 		delPanel.setLayout(null);
 		delPanel.setVisible(false);
+		
 		
 		JLabel label = new JLabel("택배 기사용 페이지입니다");
 		label.setFont(new Font("문체부 훈민정음체", Font.PLAIN, 23));
@@ -209,21 +225,47 @@ public class PrjScreen {
 		label_6.setBounds(176, 612, 491, 62);
 		delPanel.add(label_6);
 		
-		JButton saveButton = new JButton("\uC800\uC7A5");
+		JButton gofirstButton_del = new JButton("초기화면으로 돌아가기");
+		gofirstButton_del.setFont(new Font("문체부 훈민정음체", Font.PLAIN, 18));
+		gofirstButton_del.setBounds(800, 700, 300, 40);
+		delPanel.add(gofirstButton_del);
+		gofirstButton_del.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				JOptionPane.showMessageDialog(null, "초기화면으로 돌아갑니다.");
+				delPanel.setVisible(false);
+				nameTxt.setText("");
+				room_numTxt.setText("");
+				productTxt.setText("");
+				deliv_dateTxt.setText("");
+				box_locTxt.setText("");
+				firstscreenPanel.setVisible(true);
+			}
+		});
+		
+		JButton saveButton = new JButton("저장");
 		saveButton.setFont(new Font("문체부 훈민정음체", Font.PLAIN, 28));
-		saveButton.setBounds(559, 553, 133, 49);
+		saveButton.setBounds(550, 553, 133, 49);
 		delPanel.add(saveButton);
 		saveButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				JOptionPane.showMessageDialog(null, "입력 사항이 저장되었습니다.");
 				String name = nameTxt.getText();
 				String room_num = room_numTxt.getText();
 				String product = productTxt.getText();
 				String deliv_date = deliv_dateTxt.getText();
 				String box_loc = box_locTxt.getText();
+				if(name.equals("")||room_num.equals("")||product.equals("")||deliv_date.equals("")||box_loc.equals("")) {
+					JOptionPane.showMessageDialog(null, "빈 칸을 채워주세요.");
+				}
+				else {
 				index.add(new Box(name, product, deliv_date, room_num, box_loc));
-				delPanel.setVisible(false);
-				firstscreenPanel.setVisible(true);
+				JOptionPane.showMessageDialog(null, "입력 사항이 저장되었습니다.");
+				JOptionPane.showMessageDialog(null, "저장된 택배 정보: " + name + ", " + room_num + ", " + product + ", " + deliv_date + ", " + box_loc);
+				nameTxt.setText("");
+				room_numTxt.setText("");
+				productTxt.setText("");
+				deliv_dateTxt.setText("");
+				box_locTxt.setText("");
+				}
 			}
 		});
 	
@@ -293,10 +335,26 @@ public class PrjScreen {
 		txtPass.setBounds(480, 320, 296, 73);
 		infoPanel.add(txtPass);
 		
-		JButton logButton = new JButton("\uB85C\uADF8\uC778");
-		logButton.setFont(new Font("문체부 훈민정음체", Font.PLAIN, 35));
+		JButton gofirstButton_info = new JButton("초기화면으로 돌아가기");
+		gofirstButton_info.setFont(new Font("문체부 훈민정음체", Font.PLAIN, 18));
+		gofirstButton_info.setBounds(800, 700, 300, 40);
+		infoPanel.add(gofirstButton_info);
+		gofirstButton_info.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				JOptionPane.showMessageDialog(null, "초기화면으로 돌아갑니다.");
+				infoPanel.setVisible(false);
+				firstscreenPanel.setVisible(true);
+			}
+		});
+		
+		JButton logButton = new JButton("로그인");
+		logButton.setBackground(Color.WHITE);
+		logButton.setIcon(new ImageIcon("C:/Users/com/git/ChanyProject/ChanyProject/image/로그인버튼.png"));
+		logButton.setPressedIcon(new ImageIcon("C:/Users/com/git/ChanyProject/ChanyProject/image/로그인버튼_pressed.png"));
 		logButton.setBounds(816, 224, 172, 169);
 		infoPanel.add(logButton);
+		studButton.setBorderPainted(false);
+		studButton.setOpaque(false);
 		logButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				String iD = "전홍찬";
