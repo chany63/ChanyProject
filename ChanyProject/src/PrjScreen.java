@@ -14,11 +14,21 @@ import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JPasswordField;
+import javax.swing.JTable;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.SwingConstants;
+
+import net.proteanit.sql.DbUtils;
+
 import javax.swing.JTextField;
-import java.util.*;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.Iterator;
 
 class Box
 {   
@@ -28,12 +38,12 @@ class Box
    String room_num;
    String box_loc;
 
-   public Box(String name, String product, String deliv_date, String room_num, String box_loc)
+   public Box(String name, String room_num, String product, String deliv_date, String box_loc)
    {
       this.name = name;
+      this.room_num = room_num;
       this.product = product;
       this.deliv_date = deliv_date;
-      this.room_num = room_num;
       this.box_loc = box_loc;
    }
 }
@@ -61,6 +71,56 @@ public class PrjScreen {
 				}
 			}
 		});
+		createTable();
+	}
+	
+	public static void createCustomer(String name, String room_num, String product, String deliv_date, String box_loc) {
+		try {
+			Connection con = getConnection();
+			PreparedStatement insert = con.prepareStatement(""
+					+ "INSERT INTO customer"
+					+ "(name, room_num, product, deliv_date, box_loc) "
+					+ "VALUE "
+					+"('"+name+"','"+room_num+"','"+product+"','"+deliv_date+"','"+box_loc+"')");
+			insert.executeUpdate();
+			System.out.println("The date has been saved");
+		}catch(Exception e) {
+			System.out.println(e.getMessage());
+		}
+	}
+	public static void createTable() {
+		try {
+			Connection con = getConnection();
+			PreparedStatement create = con.prepareStatement(
+					"CREATE TABLE IF NOT EXISTS "
+					+ "customer(id int NOT NULL AUTO_INCREMENT,"
+					+ "name varChar(255),"
+					+ "room_num varChar(255),"
+					+ "product varChar(255),"
+					+ "deliv_date varChar(255),"
+					+ "box_loc varChar(255),"
+					+ "PRIMARY KEY(id))");
+			create.execute();
+		}catch(Exception e) {
+			System.out.println(e.getMessage());
+		}finally {
+			System.out.println("Table successfully created");
+		}
+	}
+	public static Connection getConnection() {
+		try {
+			String driver = "com.mysql.cj.jdbc.Driver";
+			String url = "jdbc:mysql://sql12.freemysqlhosting.net:3306/sql12264858?useUnicode=true&characterEncoding=UTF-8&characterSetResults=UTF-8";
+			String user = "sql12264858";
+			String pass = "EvhqW1ACr7";
+			Class.forName(driver);
+			Connection con = DriverManager.getConnection(url, user, pass);
+			System.out.println("The Connection Successful");
+			return con;
+		}catch(Exception e) {
+			System.out.println(e.getMessage());
+			return null;
+		}
 	}
 
 	public PrjScreen() {
@@ -137,7 +197,7 @@ public class PrjScreen {
 								index.remove(tmp);
 								break;   
 			            	}
-			            	else JOptionPane.showMessageDialog(null, "해당 학생에 대해 보관된 택배가 없습니다.");
+			            	else JOptionPane.showMessageDialog(null, "해당하는 학생의 이름이 검색되지 않습니다.");
 			            	check = false;
 			         	}
 			         
@@ -257,7 +317,7 @@ public class PrjScreen {
 					JOptionPane.showMessageDialog(null, "빈 칸을 채워주세요.");
 				}
 				else {
-				index.add(new Box(name, product, deliv_date, room_num, box_loc));
+				createCustomer(name, room_num, product, deliv_date, box_loc);
 				JOptionPane.showMessageDialog(null, "입력 사항이 저장되었습니다.");
 				JOptionPane.showMessageDialog(null, "저장된 택배 정보: " + name + ", " + room_num + ", " + product + ", " + deliv_date + ", " + box_loc);
 				nameTxt.setText("");
@@ -346,6 +406,10 @@ public class PrjScreen {
 				firstscreenPanel.setVisible(true);
 			}
 		});
+		JTable resultTable = new JTable();
+		resultTable.setBounds(316, 500, 500,600);
+		infoPanel.add(resultTable);
+		resultTable.setVisible(false);
 		
 		JButton logButton = new JButton("로그인");
 		logButton.setBackground(Color.WHITE);
@@ -362,12 +426,16 @@ public class PrjScreen {
 				
 				if(iD.equals(txtID.getText()) && pass.equals(txtPass.getText())) {
 					JOptionPane.showMessageDialog(null, "로그인되었습니다. 저장된 정보가 보여집니다.");
-					Iterator<Box> it = index.iterator();
-				      while(it.hasNext())
-				      {
-				         Box tmp = it.next();
-				         JOptionPane.showMessageDialog(null, "택배 저장 정보: " + tmp.name + ", " + tmp.room_num + ", " + tmp.product + ", " + tmp.deliv_date + ", " + tmp.box_loc);
-				      }
+					String tableShow = "Select name, room_num, product, deliv_date, box_loc FROM customer";
+					try {
+						Connection con = getConnection();
+						Statement statement = con.createStatement();
+						ResultSet results = statement.executeQuery(tableShow);
+						resultTable.setModel(DbUtils.resultSetToTableModel(results));			
+					}catch(Exception e1) {
+						System.out.println(e1.getMessage());
+					}
+					resultTable.setVisible(true);
 				}else {
 					JOptionPane.showMessageDialog(null, "로그인에 실패하였습니다");
 				}
@@ -399,7 +467,8 @@ public class PrjScreen {
 		closeButton.setOpaque(false);
 		closeButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				System.exit(0);
+				int choice = JOptionPane.showOptionDialog(frame, "프로그램을 정말로 종료하겠습니까?", "종료",JOptionPane.YES_NO_OPTION, JOptionPane.INFORMATION_MESSAGE, null, null, null);
+				if(choice == 0) System.exit(0);
 			}
 		});
 		frame.setSize(firstscreenPanel.getWidth(), firstscreenPanel.getHeight());
@@ -427,5 +496,3 @@ public class PrjScreen {
 			g.drawImage(img, 0, 0, null);
 		}
 	}
-	
-	
