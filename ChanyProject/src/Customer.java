@@ -7,32 +7,42 @@ import java.util.ArrayList;
 public class Customer {
 	public static void main(String[] args) {
 		createTable();
-		createCustomer("전홍찬","M419호","생수 10병","11월24일","A구역");
-		ArrayList<String> list = getCustomers();
-		for(String item: list) {
-			System.out.println(item);
+		deleteCustomer("전홍찬");
 		}
-	}
 	
-	public static ArrayList<String> getCustomers(){
+	public static String [] [] getCustomers(){
 		try {
 			Connection con = getConnection();
 			PreparedStatement statement = con.prepareStatement("Select name, room_num, product, deliv_date, box_loc FROM customer");
 			ResultSet results = statement.executeQuery();
-			ArrayList<String> list = new ArrayList<String>();
+			ArrayList<String[]> list = new ArrayList<String[]>();
 			while(results.next()) {
-				list.add("학생 이름: "+ results.getString("name") +
-						"  호실: "+ results.getString("room_num") +
-						"  택배 물품: "+ results.getString("product") +
-						"  보관 날짜: "+ results.getString("deliv_date") +
-						"  보관 장소: "+ results.getString("box_loc"));
+				list.add(new String[] {
+						results.getString("name"),
+						results.getString("room_num"),
+						results.getString("product"),
+						results.getString("deliv_date"),
+						results.getString("box_loc")
+						});
 			}
-			System.out.println("The date has been fetched");
-			return list;
+			System.out.println("The data has been fetched");
+			String [] [] arr = new String[list.size()] [5];
+			return list.toArray(arr);
 			
 		}catch(Exception e) {
 			System.out.println(e.getMessage());
 			return null;
+		}
+	}
+	public static void deleteCustomer(String name) {
+		try {
+			Connection con = getConnection();
+			PreparedStatement delete = con.prepareStatement(""
+					+ "DELETE * FROM customer where name = '"+name+"'");
+			delete.executeUpdate();
+			System.out.println("The data has been deleted");
+		}catch(Exception e) {
+			System.out.println(e.getMessage());
 		}
 	}
 	
@@ -45,7 +55,7 @@ public class Customer {
 					+ "VALUE "
 					+"('"+name+"','"+room_num+"','"+product+"','"+deliv_date+"','"+box_loc+"')");
 			insert.executeUpdate();
-			System.out.println("The date has been saved");
+			System.out.println("The data has been saved");
 		}catch(Exception e) {
 			System.out.println(e.getMessage());
 		}

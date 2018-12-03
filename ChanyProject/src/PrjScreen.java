@@ -14,6 +14,7 @@ import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JPasswordField;
+import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
@@ -71,43 +72,10 @@ public class PrjScreen {
 				}
 			}
 		});
-		createTable();
 	}
 	
-	public static void createCustomer(String name, String room_num, String product, String deliv_date, String box_loc) {
-		try {
-			Connection con = getConnection();
-			PreparedStatement insert = con.prepareStatement(""
-					+ "INSERT INTO customer"
-					+ "(name, room_num, product, deliv_date, box_loc) "
-					+ "VALUE "
-					+"('"+name+"','"+room_num+"','"+product+"','"+deliv_date+"','"+box_loc+"')");
-			insert.executeUpdate();
-			System.out.println("The date has been saved");
-		}catch(Exception e) {
-			System.out.println(e.getMessage());
-		}
-	}
-	public static void createTable() {
-		try {
-			Connection con = getConnection();
-			PreparedStatement create = con.prepareStatement(
-					"CREATE TABLE IF NOT EXISTS "
-					+ "customer(id int NOT NULL AUTO_INCREMENT,"
-					+ "name varChar(255),"
-					+ "room_num varChar(255),"
-					+ "product varChar(255),"
-					+ "deliv_date varChar(255),"
-					+ "box_loc varChar(255),"
-					+ "PRIMARY KEY(id))");
-			create.execute();
-		}catch(Exception e) {
-			System.out.println(e.getMessage());
-		}finally {
-			System.out.println("Table successfully created");
-		}
-	}
-	public static Connection getConnection() {
+	
+	/*public static Connection getConnection() {
 		try {
 			String driver = "com.mysql.cj.jdbc.Driver";
 			String url = "jdbc:mysql://sql12.freemysqlhosting.net:3306/sql12264858?useUnicode=true&characterEncoding=UTF-8&characterSetResults=UTF-8";
@@ -121,13 +89,14 @@ public class PrjScreen {
 			System.out.println(e.getMessage());
 			return null;
 		}
-	}
+	}*/
 
 	public PrjScreen() {
 		initialize();
 	}
 	
 	private void initialize() {
+		Customer customer = new Customer();
 		frame = new JFrame();
 		frame.getContentPane().setBackground(Color.WHITE);
 		frame.setBounds(100, 100, 1200, 800);
@@ -317,7 +286,7 @@ public class PrjScreen {
 					JOptionPane.showMessageDialog(null, "빈 칸을 채워주세요.");
 				}
 				else {
-				createCustomer(name, room_num, product, deliv_date, box_loc);
+				customer.createCustomer(name, room_num, product, deliv_date, box_loc);
 				JOptionPane.showMessageDialog(null, "입력 사항이 저장되었습니다.");
 				JOptionPane.showMessageDialog(null, "저장된 택배 정보: " + name + ", " + room_num + ", " + product + ", " + deliv_date + ", " + box_loc);
 				nameTxt.setText("");
@@ -406,10 +375,32 @@ public class PrjScreen {
 				firstscreenPanel.setVisible(true);
 			}
 		});
-		JTable resultTable = new JTable();
-		resultTable.setBounds(316, 500, 500,600);
-		infoPanel.add(resultTable);
-		resultTable.setVisible(false);
+		
+		JPanel tablePanel = new JPanel();
+		tablePanel.setBounds(0, 0, 1186, 763);
+		tablePanel.setVisible(false);
+		String [] [] data = Customer.getCustomers();
+		String [] headers = new String [] {"학생 이름", "호실", "택배 물품", "보관 날짜", "보관 장소"};
+		JTable resultTable = new JTable(data, headers);
+		resultTable.setRowHeight(30);
+		resultTable.setFont(new Font("맑은 고딕", Font.BOLD, 28));
+		resultTable.setAlignmentX(0);
+		resultTable.setSize(800,600);
+		resultTable.setPreferredScrollableViewportSize(new Dimension(1000,500));
+		tablePanel.add(new JScrollPane(resultTable));
+		frame.getContentPane().add(tablePanel);
+		
+		JButton gofirstButton_table = new JButton("초기화면으로 돌아가기");
+		gofirstButton_table.setFont(new Font("문체부 훈민정음체", Font.PLAIN, 18));
+		gofirstButton_table.setBounds(800, 700, 300, 40);
+		tablePanel.add(gofirstButton_table);
+		gofirstButton_table.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				JOptionPane.showMessageDialog(null, "초기화면으로 돌아갑니다.");
+				tablePanel.setVisible(false);
+				firstscreenPanel.setVisible(true);
+			}
+		});
 		
 		JButton logButton = new JButton("로그인");
 		logButton.setBackground(Color.WHITE);
@@ -426,15 +417,8 @@ public class PrjScreen {
 				
 				if(iD.equals(txtID.getText()) && pass.equals(txtPass.getText())) {
 					JOptionPane.showMessageDialog(null, "로그인되었습니다. 저장된 정보가 보여집니다.");
-					String tableShow = "Select name, room_num, product, deliv_date, box_loc FROM customer";
-					try {
-						Connection con = getConnection();
-						Statement statement = con.createStatement();
-						ResultSet results = statement.executeQuery(tableShow);
-						resultTable.setModel(DbUtils.resultSetToTableModel(results));			
-					}catch(Exception e1) {
-						System.out.println(e1.getMessage());
-					}
+					infoPanel.setVisible(false);
+					tablePanel.setVisible(true);
 					resultTable.setVisible(true);
 				}else {
 					JOptionPane.showMessageDialog(null, "로그인에 실패하였습니다");
