@@ -2,12 +2,13 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
 
 public class Customer {
 	public static void main(String[] args) {
 		createTable();
-		deleteCustomer("전홍찬");
 		}
 	
 	public static String [] [] getCustomers(){
@@ -34,17 +35,57 @@ public class Customer {
 			return null;
 		}
 	}
+	public static String selectCustomers(String name) {
+        String sql = "select * from customer where name = ?;";
+        PreparedStatement pstmt = null;
+        String list = null;
+        Connection conn = getConnection();
+        try {
+            pstmt = conn.prepareStatement(sql);
+            pstmt.setString(1, name);
+            ResultSet rs = pstmt.executeQuery();
+ 
+            if (rs.next()) {
+            	list=("학생 이름 : "+ rs.getString("name") +
+						" 호실: "+ rs.getString("room_num") +
+						" 택배 물품: "+ rs.getString("product") +
+						" 보관 날짜: "+ rs.getString("deliv_date") +
+						" 보관 장소: "+ rs.getString("box_loc"));
+            	System.out.println("The data has been fetched");
+            }
+        } catch (SQLException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        } finally {
+            try {
+                if (pstmt != null && !pstmt.isClosed())
+                    pstmt.close();
+            } catch (SQLException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+        }
+        return list;
+    }
 	public static void deleteCustomer(String name) {
-		try {
-			Connection con = getConnection();
-			PreparedStatement delete = con.prepareStatement(""
-					+ "DELETE * FROM customer where name = '"+name+"'");
-			delete.executeUpdate();
-			System.out.println("The data has been deleted");
-		}catch(Exception e) {
-			System.out.println(e.getMessage());
-		}
-	}
+        String sql = "delete from customer where name = ?;";
+        PreparedStatement pstmt = null;
+        Connection conn = getConnection();
+        try {
+            pstmt = conn.prepareStatement(sql);
+            pstmt.setString(1, name);
+            pstmt.executeUpdate();
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                if (pstmt != null && !pstmt.isClosed())
+                    pstmt.close();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+    }
 	
 	public static void createCustomer(String name, String room_num, String product, String deliv_date, String box_loc) {
 		try {

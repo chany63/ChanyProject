@@ -31,26 +31,8 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Iterator;
 
-class Box
-{   
-   String name;
-   String product;
-   String deliv_date;
-   String room_num;
-   String box_loc;
-
-   public Box(String name, String room_num, String product, String deliv_date, String box_loc)
-   {
-      this.name = name;
-      this.room_num = room_num;
-      this.product = product;
-      this.deliv_date = deliv_date;
-      this.box_loc = box_loc;
-   }
-}
 
 public class PrjScreen {
-	static LinkedList<Box> index = new LinkedList<Box>();
 	private JFrame frame;
 	private JTextField nameTxt;
 	private JTextField room_numTxt;
@@ -74,22 +56,6 @@ public class PrjScreen {
 		});
 	}
 	
-	
-	/*public static Connection getConnection() {
-		try {
-			String driver = "com.mysql.cj.jdbc.Driver";
-			String url = "jdbc:mysql://sql12.freemysqlhosting.net:3306/sql12264858?useUnicode=true&characterEncoding=UTF-8&characterSetResults=UTF-8";
-			String user = "sql12264858";
-			String pass = "EvhqW1ACr7";
-			Class.forName(driver);
-			Connection con = DriverManager.getConnection(url, user, pass);
-			System.out.println("The Connection Successful");
-			return con;
-		}catch(Exception e) {
-			System.out.println(e.getMessage());
-			return null;
-		}
-	}*/
 
 	public PrjScreen() {
 		initialize();
@@ -148,33 +114,12 @@ public class PrjScreen {
 				}
 				else{
 					JOptionPane.showMessageDialog(null, "학생의 이름이 검색됩니다.");
-					while(true)
-			      	{
-			         	boolean check = true;
-			         	Iterator<Box> it = index.iterator();
-			         
-			         	if(it.hasNext() == false) check = false;
-			         
-			         	while(it.hasNext()) {
-			        	 Box tmp = it.next();
-			            	if(tmp.name.equals(name)) {
-			            		JOptionPane.showMessageDialog(null, "택배를 확인하여 수취합니다.");
-			            		JOptionPane.showMessageDialog(null, "수취한 택배 정보: " + tmp.name + ", " + tmp.room_num + ", " + tmp.product + ", " + tmp.deliv_date + ", " + tmp.box_loc);
-			            		studPanel.setVisible(false);
-								namesearchTxt.setText("");
-								firstscreenPanel.setVisible(true);
-								index.remove(tmp);
-								break;   
-			            	}
-			            	else JOptionPane.showMessageDialog(null, "해당하는 학생의 이름이 검색되지 않습니다.");
-			            	check = false;
-			         	}
-			         
-			         	if(check == false) break;
-			      	}
+					JOptionPane.showMessageDialog(null, customer.selectCustomers(name));
+					namesearchTxt.setText("");
+			        customer.deleteCustomer(name);
+			        }
 				}	
-			}
-		});
+			});
 		
 		JPanel delPanel = new JPanel();
 		delPanel.setBackground(Color.WHITE);
@@ -379,7 +324,7 @@ public class PrjScreen {
 		JPanel tablePanel = new JPanel();
 		tablePanel.setBounds(0, 0, 1186, 763);
 		tablePanel.setVisible(false);
-		String [] [] data = Customer.getCustomers();
+		String [] [] data = customer.getCustomers();
 		String [] headers = new String [] {"학생 이름", "호실", "택배 물품", "보관 날짜", "보관 장소"};
 		JTable resultTable = new JTable(data, headers);
 		resultTable.setRowHeight(30);
@@ -423,6 +368,8 @@ public class PrjScreen {
 				}else {
 					JOptionPane.showMessageDialog(null, "로그인에 실패하였습니다");
 				}
+				txtID.setText("");
+				txtPass.setText("");
 			}
 		});
 		
